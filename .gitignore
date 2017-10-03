@@ -1,0 +1,5 @@
+.spyproject/
+pkl/
+database.sqlite
+Indicatorcode to name.csv
+IndicatorColumn.txt
