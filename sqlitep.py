@@ -1,24 +1,26 @@
 from sqlalchemy import create_engine
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
+import random
 
 engine = create_engine('sqlite:///E:\Mission\Personal project\World bank Indicators\database.sqlite')
 print(engine.table_names())
 
 df = pd.read_sql_query("SELECT IndicatorCode, CountryCode, Value, Year FROM Indicators WHERE CountryCode == 'CHN'", engine)
-#df = pd.read_sql_query("SELECT IndicatorName, IndicatorCode, CountryCode FROM Indicators WHERE Year = 2012", engine)
+
+df_china_tertiary = df.loc[df.IndicatorCode == 'SE.TER.ENRR', ['Value', 'Year']]
+df_china_GDP = df.loc[df.IndicatorCode == 'NY.GDP.PCAP.KN', ['Value', 'Year']]
 
 
-print(df.head())
-print(df.loc([0], [0]))
 
-df_china_tertiary = df[df['IndicatorCode'] == 'SE.TER.ENRR']
-df_china_GDP = df[df['IndicatorCode'] == 'NY.GDP.PCAP.KN']
-#df_china.to_csv('Indicatorcode to name.csv', index=False, encoding='utf-8')
+lst = [(r['Year'], r['Value'], r1['Value'])  for i,r in df_china_GDP.iterrows() for i1,r1 in df_china_tertiary.iterrows() if r['Year'] == r1['Year'] ]
 
-#df_plot = df_china_tertiary.iloc([0])
-#print(df_plot().head())
+df_plot = pd.DataFrame(lst, columns = ['Year', 'GDP Value', 'Tertiary' ])
 
-#plt.plot(df_china_tertiary[:, 'Value'], df_china_tertiary[:, 'Year'], )
-#plt.plot(df[:, 'Value'])
+
+col = [random.choice(['red', 'blue', 'green','yellow']) for _ in range(41)]
+df_plot.plot.scatter(x = 'Year', y = 'Tertiary', s= (np.array(df_plot.loc[:, 'GDP Value']))/75, c= col, alpha=0.5 )
+plt.yticks([5,10,15,20,25,30],['5%', '10%', '15%','20%','25%','30%'])
+plt.show()
 
